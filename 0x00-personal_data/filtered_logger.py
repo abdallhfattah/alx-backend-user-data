@@ -82,7 +82,8 @@ def main():
         # Create a dictionary that maps field names to their respective values
         row_data = dict(zip(fields, row))
         # Create a log message in the form of key=value pairs separated by ";"
-        message = "; ".join([f"{key}={value}" for key, value in row_data.items()])
+        message = "; ".join([f"{key}={value}" 
+                            for key, value in row_data.items()])
         # Log the filtered message
         logger.info(message)
 
