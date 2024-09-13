@@ -3,9 +3,8 @@
 
 import re
 from typing import List
-import mysql.connector
+import mysql
 import logging
-from mysql.connector import connection
 import os
 
 
