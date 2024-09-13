@@ -65,17 +65,28 @@ def main():
     Obtain a database connection using get_db and retrieves all rows
     in the users table and display each row under a filtered format
     """
+    # connecting to the database
     db = get_db()
+    # cursor allow's you to make quires
     cursor = db.cursor()
     cursor.execute("SELECT * FROM users;")
-    field_names = [i[0] for i in cursor.description]
+    # (column_name, type_code, display_size, internal_size, precision, scale, null_ok)
+    # we need column_name
+    fields = [i[0] for i in cursor.description]
 
+    # Get the logger instance
     logger = get_logger()
 
+    # Iterate over each row from the result set
     for row in cursor:
-        str_row = "".join(f"{f}={str(r)}; " for r, f in zip(row, field_names))
-        logger.info(str_row.strip())
+        # Create a dictionary that maps field names to their respective values
+        row_data = dict(zip(fields, row))
+        # Create a log message in the form of key=value pairs separated by ";"
+        message = "; ".join([f"{key}={value}" for key, value in row_data.items()])
+        # Log the filtered message
+        logger.info(message)
 
+    # Close the cursor and database connection
     cursor.close()
     db.close()
 
