@@ -70,7 +70,7 @@ def main():
     # cursor allow's you to make quires
     cursor = db.cursor()
     cursor.execute("SELECT * FROM users;")
-    # (column_name, type_code, display_size, internal_size, precision, scale, null_ok)
+    # (column_name, type_code, display_size, internal_size, ...)
     # we need column_name
     fields = [i[0] for i in cursor.description]
 
@@ -82,7 +82,8 @@ def main():
         # Create a dictionary that maps field names to their respective values
         row_data = dict(zip(fields, row))
         # Create a log message in the form of key=value pairs separated by ";"
-        message = "; ".join([f"{key}={value}" for key, value in row_data.items()])
+        message = "; ".join([f"{key}={value}"
+                            for key, value in row_data.items()])
         # Log the filtered message
         logger.info(message)
 
