@@ -5,19 +5,21 @@ import re
 from typing import List
 import mysql.connector
 import logging
-import os
+from os import environ
 
 
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
 
-def get_db() -> mysql.connector.connection.MYSQLConnection:
-    """Connection to MySQL environment"""
-    db_connect = mysql.connector.connect(
-        user=os.getenv("PERSONAL_DATA_DB_USERNAME", "root"),
-        password=os.getenv("PERSONAL_DATA_DB_PASSWORD", ""),
-        host=os.getenv("PERSONAL_DATA_DB_HOST", "localhost"),
-        database=os.getenv("PERSONAL_DATA_DB_NAME"),
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """Returns a connector to a MySQL database"""
+    username = environ.get("PERSONAL_DATA_DB_USERNAME", "root")
+    password = environ.get("PERSONAL_DATA_DB_PASSWORD", "")
+    host = environ.get("PERSONAL_DATA_DB_HOST", "localhost")
+    db_name = environ.get("PERSONAL_DATA_DB_NAME")
+
+    db_connect = mysql.connector.connection.MySQLConnection(
+        user=username, password=password, host=host, database=db_name
     )
     return db_connect
 
@@ -49,12 +51,11 @@ class RedactingFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         """formating the record"""
-        original_message = super().format(record)
         redacted_message = filter_datum(
             self._fields,
-            RedactingFormatter.REDACTION,
-            original_message,
-            RedactingFormatter.SEPARATOR,
+            self.REDACTION,
+            super().format(record),
+            self.SEPARATOR,
         )
         return redacted_message
 
@@ -81,8 +82,7 @@ def main():
         # Create a dictionary that maps field names to their respective values
         row_data = dict(zip(fields, row))
         # Create a log message in the form of key=value pairs separated by ";"
-        message = "; ".join([f"{key}={value}"
-                            for key, value in row_data.items()])
+        message = "; ".join([f"{key}={value}" for key, value in row_data.items()])
         # Log the filtered message
         logger.info(message)
 
