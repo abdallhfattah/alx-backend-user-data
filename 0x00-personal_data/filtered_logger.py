@@ -3,7 +3,7 @@
 
 import re
 from typing import List
-import mysql
+import mysql.connector
 import logging
 from os import environ
 
