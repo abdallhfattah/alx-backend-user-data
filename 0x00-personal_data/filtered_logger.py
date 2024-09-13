@@ -12,22 +12,15 @@ import os
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
 
-def get_db() -> mysql.connector.connection.MySQLConnection:
-    """
-    Returns a connector to a MySQL database
-    """
-    # Get credentials from environment variables
-    username = os.environ.get("PERSONAL_DATA_DB_USERNAME", "root")
-    password = os.environ.get("PERSONAL_DATA_DB_PASSWORD", "")
-    host = os.environ.get("PERSONAL_DATA_DB_HOST", "localhost")
-    db_name = os.environ.get("PERSONAL_DATA_DB_NAME")
-
-    # Create a connection to the database
-    connection = mysql.connector.connect(
-        user=username, password=password, host=host, database=db_name
+def get_db() -> mysql.connector.connection.MYSQLConnection:
+    """Connection to MySQL environment"""
+    db_connect = mysql.connector.connect(
+        user=os.getenv("PERSONAL_DATA_DB_USERNAME", "root"),
+        password=os.getenv("PERSONAL_DATA_DB_PASSWORD", ""),
+        host=os.getenv("PERSONAL_DATA_DB_HOST", "localhost"),
+        database=os.getenv("PERSONAL_DATA_DB_NAME"),
     )
-
-    return connection
+    return db_connect
 
 
 def get_logger() -> logging.Logger:
@@ -89,8 +82,7 @@ def main():
         # Create a dictionary that maps field names to their respective values
         row_data = dict(zip(fields, row))
         # Create a log message in the form of key=value pairs separated by ";"
-        message = "; ".join([f"{key}={value}"
-                            for key, value in row_data.items()])
+        message = "; ".join([f"{key}={value}" for key, value in row_data.items()])
         # Log the filtered message
         logger.info(message)
 
