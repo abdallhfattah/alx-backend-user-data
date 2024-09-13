@@ -15,11 +15,12 @@ class RedactingFormatter(logging.Formatter):
     SEPARATOR = ";"
 
     def __init__(self, fields: List[str]):
+        """init"""
         super(RedactingFormatter, self).__init__(self.FORMAT)
         self._fields = fields
 
     def format(self, record: logging.LogRecord) -> str:
-        # Get the base message with the default format
+        """formating the record"""
         original_message = super().format(record)
         redacted_message = filter_datum(
             self._fields,
