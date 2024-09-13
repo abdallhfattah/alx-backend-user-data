@@ -60,6 +60,26 @@ class RedactingFormatter(logging.Formatter):
         return redacted_message
 
 
+def main():
+    """
+    Obtain a database connection using get_db and retrieves all rows
+    in the users table and display each row under a filtered format
+    """
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users;")
+    field_names = [i[0] for i in cursor.description]
+
+    logger = get_logger()
+
+    for row in cursor:
+        str_row = "".join(f"{f}={str(r)}; " for r, f in zip(row, field_names))
+        logger.info(str_row.strip())
+
+    cursor.close()
+    db.close()
+
+
 def filter_datum(
     fields: List[str], redaction: str, message: str, separator: str
 ) -> str:
@@ -79,3 +99,7 @@ def filter_datum(
         pattern = rf"({field})=[^{separator}]*"
         message = re.sub(pattern, rf"\1={redaction}", message)
     return message
+
+
+if __name__ == "__main__":
+    main()
